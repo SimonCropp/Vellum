@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CliFx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vellum\Vellum.csproj" />
+  </ItemGroup>
+
+</Project>

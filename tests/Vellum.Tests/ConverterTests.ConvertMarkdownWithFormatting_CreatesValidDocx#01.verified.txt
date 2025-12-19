@@ -1,0 +1,3 @@
+﻿Formatted Document
+This has bold and italic text.
+And some inline code too.
