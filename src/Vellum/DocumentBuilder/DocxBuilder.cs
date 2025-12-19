@@ -16,6 +16,13 @@ public sealed class DocxBuilder : IDocxBuilder
     private readonly Stack<ListContext> _listStack = new();
     private int _abstractNumId;
 
+    // Table state
+    private Table? _currentTable;
+    private TableRow? _currentTableRow;
+    private TableCell? _currentTableCell;
+    private int _currentTableColumnCount;
+    private bool _isHeaderRow;
+
     private record ListContext(int AbstractNumId, bool IsOrdered, int Level);
 
     public DocxBuilder(Stream outputStream)
@@ -72,7 +79,14 @@ public sealed class DocxBuilder : IDocxBuilder
     {
         if (_currentParagraph != null)
         {
-            _body.AppendChild(_currentParagraph);
+            if (_currentTableCell != null)
+            {
+                _currentTableCell.AppendChild(_currentParagraph);
+            }
+            else
+            {
+                _body.AppendChild(_currentParagraph);
+            }
             _currentParagraph = null;
         }
     }
@@ -295,6 +309,105 @@ public sealed class DocxBuilder : IDocxBuilder
         var run = new Run();
         run.AppendChild(new Break());
         _currentParagraph!.AppendChild(run);
+    }
+
+    public void StartTable(int columnCount)
+    {
+        _currentTableColumnCount = columnCount;
+        _currentTable = new Table();
+
+        // Add table properties with borders
+        var tblPr = new TableProperties();
+
+        var tblBorders = new TableBorders(
+            new TopBorder { Val = BorderValues.Single, Size = 4, Color = "auto" },
+            new BottomBorder { Val = BorderValues.Single, Size = 4, Color = "auto" },
+            new LeftBorder { Val = BorderValues.Single, Size = 4, Color = "auto" },
+            new RightBorder { Val = BorderValues.Single, Size = 4, Color = "auto" },
+            new InsideHorizontalBorder { Val = BorderValues.Single, Size = 4, Color = "auto" },
+            new InsideVerticalBorder { Val = BorderValues.Single, Size = 4, Color = "auto" }
+        );
+        tblPr.AppendChild(tblBorders);
+
+        // Set table width to 100%
+        tblPr.AppendChild(new TableWidth { Width = "5000", Type = TableWidthUnitValues.Pct });
+
+        _currentTable.AppendChild(tblPr);
+
+        // Define column widths (equal distribution)
+        var tblGrid = new TableGrid();
+        var colWidth = 5000 / columnCount;
+        for (var i = 0; i < columnCount; i++)
+        {
+            tblGrid.AppendChild(new GridColumn { Width = colWidth.ToString() });
+        }
+        _currentTable.AppendChild(tblGrid);
+    }
+
+    public void EndTable()
+    {
+        if (_currentTable != null)
+        {
+            _body.AppendChild(_currentTable);
+            _currentTable = null;
+            _currentTableColumnCount = 0;
+        }
+    }
+
+    public void StartTableRow(bool isHeader = false)
+    {
+        _isHeaderRow = isHeader;
+        _currentTableRow = new TableRow();
+
+        if (isHeader)
+        {
+            var trPr = new TableRowProperties();
+            trPr.AppendChild(new TableHeader());
+            _currentTableRow.AppendChild(trPr);
+        }
+    }
+
+    public void EndTableRow()
+    {
+        if (_currentTableRow != null && _currentTable != null)
+        {
+            _currentTable.AppendChild(_currentTableRow);
+            _currentTableRow = null;
+            _isHeaderRow = false;
+        }
+    }
+
+    public void StartTableCell()
+    {
+        _currentTableCell = new TableCell();
+
+        var tcPr = new TableCellProperties();
+
+        // Add shading for header cells
+        if (_isHeaderRow)
+        {
+            tcPr.AppendChild(new Shading { Val = ShadingPatternValues.Clear, Fill = "E0E0E0" });
+        }
+
+        // Set vertical alignment to center
+        tcPr.AppendChild(new TableCellVerticalAlignment { Val = TableVerticalAlignmentValues.Center });
+
+        _currentTableCell.AppendChild(tcPr);
+    }
+
+    public void EndTableCell()
+    {
+        if (_currentTableCell != null && _currentTableRow != null)
+        {
+            // Ensure cell has at least one paragraph (required by OpenXML)
+            if (!_currentTableCell.Elements<Paragraph>().Any())
+            {
+                _currentTableCell.AppendChild(new Paragraph());
+            }
+
+            _currentTableRow.AppendChild(_currentTableCell);
+            _currentTableCell = null;
+        }
     }
 
     public void Save()

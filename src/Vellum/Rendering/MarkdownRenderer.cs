@@ -1,3 +1,4 @@
+using Markdig.Extensions.Tables;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using Vellum.DocumentBuilder;
@@ -55,6 +56,10 @@ public sealed class MarkdownRenderer
 
             case ListBlock list:
                 RenderList(list);
+                break;
+
+            case Table table:
+                RenderTable(table);
                 break;
 
             case ThematicBreakBlock:
@@ -222,6 +227,68 @@ public sealed class MarkdownRenderer
         }
 
         _builder.EndList();
+    }
+
+    private void RenderTable(Table table)
+    {
+        // Count columns from the first row
+        var columnCount = 0;
+        if (table.Count > 0 && table[0] is TableRow firstRow)
+        {
+            columnCount = firstRow.Count;
+        }
+
+        if (columnCount == 0) return;
+
+        _builder.StartTable(columnCount);
+
+        var isFirstRow = true;
+        foreach (var block in table)
+        {
+            if (block is TableRow row)
+            {
+                RenderTableRow(row, isFirstRow);
+                isFirstRow = false;
+            }
+        }
+
+        _builder.EndTable();
+    }
+
+    private void RenderTableRow(TableRow row, bool isHeader)
+    {
+        _builder.StartTableRow(isHeader);
+
+        foreach (var block in row)
+        {
+            if (block is TableCell cell)
+            {
+                RenderTableCell(cell);
+            }
+        }
+
+        _builder.EndTableRow();
+    }
+
+    private void RenderTableCell(TableCell cell)
+    {
+        _builder.StartTableCell();
+
+        foreach (var block in cell)
+        {
+            if (block is ParagraphBlock paragraph)
+            {
+                _builder.StartParagraph();
+                RenderInlines(paragraph.Inline);
+                _builder.EndParagraph();
+            }
+            else
+            {
+                RenderBlock(block);
+            }
+        }
+
+        _builder.EndTableCell();
     }
 
     private void RenderListItem(ListItemBlock listItem)

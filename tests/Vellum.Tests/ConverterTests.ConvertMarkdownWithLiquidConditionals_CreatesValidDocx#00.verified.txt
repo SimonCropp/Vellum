@@ -1,0 +1,14 @@
+﻿{
+  Text:
+Order Confirmation
+Order #12345
+PRIORITY ORDER - Expedited shipping enabled
+Items
+Widget (x2)
+Gadget (x1) SALE
+Gizmo (x3)
+Shipping
+International shipping to Canada
+Customs documentation will be included.
+Thank you for your order!
+}

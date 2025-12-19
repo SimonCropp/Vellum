@@ -111,6 +111,36 @@ public interface IDocxBuilder : IDisposable
     void AddLineBreak();
 
     /// <summary>
+    /// Starts a table with the specified number of columns.
+    /// </summary>
+    void StartTable(int columnCount);
+
+    /// <summary>
+    /// Ends the current table.
+    /// </summary>
+    void EndTable();
+
+    /// <summary>
+    /// Starts a table row.
+    /// </summary>
+    void StartTableRow(bool isHeader = false);
+
+    /// <summary>
+    /// Ends the current table row.
+    /// </summary>
+    void EndTableRow();
+
+    /// <summary>
+    /// Starts a table cell.
+    /// </summary>
+    void StartTableCell();
+
+    /// <summary>
+    /// Ends the current table cell.
+    /// </summary>
+    void EndTableCell();
+
+    /// <summary>
     /// Saves the document.
     /// </summary>
     void Save();

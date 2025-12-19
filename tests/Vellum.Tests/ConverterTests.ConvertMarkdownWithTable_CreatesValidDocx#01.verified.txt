@@ -1,0 +1,5 @@
+﻿Product Catalog
+Product	Price	Quantity
+Apple	$1.00	100
+Banana	$0.50	150
+Orange	$0.75	200

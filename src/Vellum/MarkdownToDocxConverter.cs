@@ -12,6 +12,7 @@ public sealed class MarkdownToDocxConverter : IMarkdownToDocxConverter
 {
     private readonly MarkdownPipeline _pipeline;
     private readonly FluidParser _parser;
+    private readonly TemplateOptions _templateOptions;
 
     public MarkdownToDocxConverter()
     {
@@ -20,6 +21,10 @@ public sealed class MarkdownToDocxConverter : IMarkdownToDocxConverter
             .Build();
 
         _parser = new FluidParser();
+
+        // Configure Fluid to allow member access on any type
+        _templateOptions = new TemplateOptions();
+        _templateOptions.MemberAccessStrategy = new UnsafeMemberAccessStrategy();
     }
 
     /// <inheritdoc />
@@ -37,7 +42,7 @@ public sealed class MarkdownToDocxConverter : IMarkdownToDocxConverter
         string processedMarkdown;
         if (_parser.TryParse(markdownTemplate, out var template, out var error))
         {
-            var context = new TemplateContext(model);
+            var context = new TemplateContext(model, _templateOptions);
             processedMarkdown = await template.RenderAsync(context);
         }
         else

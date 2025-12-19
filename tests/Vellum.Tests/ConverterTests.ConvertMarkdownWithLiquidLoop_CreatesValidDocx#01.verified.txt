@@ -1,0 +1,7 @@
+﻿Project Team
+Team Members
+Alice - Developer
+Bob - Designer
+Charlie - Manager
+Summary
+Total members: 3
