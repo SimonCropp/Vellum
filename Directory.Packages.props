@@ -6,11 +6,11 @@
     <!-- Core Library -->
     <PackageVersion Include="Markdig" Version="0.44.0" />
     <PackageVersion Include="DocumentFormat.OpenXml" Version="3.3.0" />
-    <PackageVersion Include="Fluid.Core" Version="2.11.1" />
+    <PackageVersion Include="Fluid.Core" Version="2.31.0" />
     <!-- CLI -->
     <PackageVersion Include="CliFx" Version="2.3.6" />
     <!-- Testing -->
-    <PackageVersion Include="TUnit" Version="1.5.70" />
+    <PackageVersion Include="TUnit" Version="1.5.80" />
     <PackageVersion Include="Verify.TUnit" Version="31.9.0" />
     <PackageVersion Include="Verify.OpenXml" Version="0.2.0" />
   </ItemGroup>
